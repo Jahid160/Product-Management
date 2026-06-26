@@ -99,13 +99,6 @@ export const ProductModal: React.FC<ProductModalProps> = ({
                 ${product.price.toFixed(2)}
               </span>
             </div>
-
-            <button
-              onClick={onClose}
-              className="bg-blue-600 hover:bg-blue-700 text-white dark:bg-blue-500 dark:hover:bg-blue-600 px-6 py-2.5 rounded-xl font-semibold text-sm transition shadow-sm shadow-blue-200 dark:shadow-none"
-            >
-              Add to Cart
-            </button>
           </div>
         </div>
       </div>

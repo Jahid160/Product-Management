@@ -3,6 +3,8 @@ import type { Product } from "../types/product";
 import { ProductCard } from "../component/ProductCard";
 import { ProductModal } from "../component/ProductModal";
 import { getAllProducts } from "../services/api";
+import { useDebounce } from "../hooks/useDebounce";
+import { ProductSkeleton } from "../component/ProductSkeleton";
 
 export const ProductListing = () => {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
@@ -10,15 +12,18 @@ export const ProductListing = () => {
 
   const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
-
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
-
+  const debouncedSearchQuery = useDebounce(searchQuery, 500);
   useEffect(() => {
     const fetchProducts = async () => {
       try {
+        setLoading(true);
+        setError(null);
         const data = await getAllProducts();
         setAllProducts(data);
 
@@ -27,13 +32,18 @@ export const ProductListing = () => {
           ...Array.from(new Set(data.map((p: Product) => p.category))),
         ];
         setCategories(uniqueCategories);
-      } catch (error) {
-        console.error("Failed to fetch products:", error);
+      } catch (err: any) {
+        setError(
+          err.message || "Something went wrong while fetching products.",
+        );
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchProducts();
   }, []);
+  useEffect(() => {}, [debouncedSearchQuery, selectedCategory]);
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
     setCurrentPage(1);
@@ -48,7 +58,7 @@ export const ProductListing = () => {
   const filteredProducts = allProducts.filter((product) => {
     const matchesSearch = product.title
       .toLowerCase()
-      .includes(searchQuery.toLowerCase());
+      .includes(debouncedSearchQuery.toLowerCase());
     const matchesCategory =
       selectedCategory === "all" || product.category === selectedCategory;
     return matchesSearch && matchesCategory;
@@ -81,6 +91,7 @@ export const ProductListing = () => {
             placeholder="Search products..."
             value={searchQuery}
             onChange={handleSearchChange}
+            disabled={loading}
             className="w-full px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100 text-sm"
           />
         </div>
@@ -91,16 +102,38 @@ export const ProductListing = () => {
             onChange={handleCategoryChange}
             className="w-full px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100 text-sm capitalize"
           >
-            {categories.map((cat) => (
-              <option key={cat} value={cat}>
-                {cat}
-              </option>
-            ))}
+            {loading ? (
+              <option>Loading...</option>
+            ) : (
+              categories.map((cat) => (
+                <option key={cat} value={cat}>
+                  {cat}
+                </option>
+              ))
+            )}
           </select>
         </div>
       </div>
 
-      {currentProducts.length > 0 ? (
+      {error ? (
+        <div className="text-center py-12 bg-red-50 dark:bg-red-950/20 rounded-xl border border-red-100 dark:border-red-900/30">
+          <p className="text-red-600 dark:text-red-400 font-medium">
+            ⚠️ {error}
+          </p>
+          <button
+            onClick={() => window.location.reload()}
+            className="mt-4 text-xs bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition"
+          >
+            Try Again
+          </button>
+        </div>
+      ) : loading ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          {Array.from({ length: itemsPerPage }).map((_, idx) => (
+            <ProductSkeleton key={idx} />
+          ))}
+        </div>
+      ) : currentProducts.length > 0 ? (
         <>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {currentProducts.map((product) => (
