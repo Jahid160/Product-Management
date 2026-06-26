@@ -2,48 +2,25 @@ import React, { useEffect, useState } from "react";
 import type { Product } from "../types/product";
 import { ProductCard } from "../component/ProductCard";
 import { ProductModal } from "../component/ProductModal";
-import { getAllProducts } from "../services/api";
+
 import { useDebounce } from "../hooks/useDebounce";
 import { ProductSkeleton } from "../component/ProductSkeleton";
+import { useProducts } from "../hooks/useProducts";
 
 export const ProductListing = () => {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const [allProducts, setAllProducts] = useState<Product[]>([]);
-  const [categories, setCategories] = useState<string[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
   const debouncedSearchQuery = useDebounce(searchQuery, 500);
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const data = await getAllProducts();
-        setAllProducts(data);
 
-        const uniqueCategories = [
-          "all",
-          ...Array.from(new Set(data.map((p: Product) => p.category))),
-        ];
-        setCategories(uniqueCategories);
-      } catch (err: any) {
-        setError(
-          err.message || "Something went wrong while fetching products.",
-        );
-      } finally {
-        setLoading(false);
-      }
-    };
+  const { data: allProducts, categories, loading, error } = useProducts();
 
-    fetchProducts();
-  }, []);
   useEffect(() => {}, [debouncedSearchQuery, selectedCategory]);
+
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
     setCurrentPage(1);

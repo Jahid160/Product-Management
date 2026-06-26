@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { getAllProducts } from "../services/api";
 import type { Product } from "../types/product";
 
 interface ProductsState {
@@ -18,39 +17,53 @@ export const useProducts = () => {
   });
 
   useEffect(() => {
-    const loadData = async () => {
+    const controller = new AbortController();
+    const { signal } = controller;
+
+    const fetchProducts = async () => {
       try {
         setState((prev) => ({ ...prev, loading: true, error: null }));
 
-        const productsData = await getAllProducts();
+        const response = await fetch("https://fakestoreapi.com/products", {
+          signal,
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data: Product[] = await response.json();
 
         const uniqueCategories = [
           "all",
-          ...Array.from(new Set(productsData.map((p) => p.category))),
+          ...Array.from(new Set(data.map((p) => p.category))),
         ];
 
         setState({
-          data: productsData,
+          data,
           categories: uniqueCategories,
           loading: false,
           error: null,
         });
       } catch (err: any) {
+        if (err.name === "AbortError") {
+          console.log("Fetch aborted safely");
+          return;
+        }
         setState((prev) => ({
           ...prev,
           loading: false,
-          error: err.message || "Failed to load products.",
+          error: err.message || "Failed to fetch products.",
         }));
       }
     };
 
-    loadData();
+    fetchProducts();
+
+    return () => {
+      controller.abort();
+    };
   }, []);
 
-  return {
-    products: state.data,
-    categories: state.categories,
-    loading: state.loading,
-    error: state.error,
-  };
+  return state;
 };
