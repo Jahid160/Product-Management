@@ -1,5 +1,5 @@
 import React from "react";
-// Import Link from your router library
+
 import { Link } from "react-router";
 
 export const Footer: React.FC = () => {

@@ -1,77 +1,38 @@
-# React + TypeScript + Vite
+🛠️ Key Features
+Product Grid: Displays all products in a beautiful, responsive grid layout.
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Product Modal: Clicking the "View Details" button pops up a modal containing full product information.
 
-Currently, two official plugins are available:
+Search & Filter: Allows real-time product filtering using the search bar and category dropdown.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Client-side Pagination: Displays 8 products per page with Next/Previous navigation buttons at the bottom.
 
-## React Compiler
+Debounced Search: The search executes 300ms after typing stops, significantly improving site speed and performance.
 
-The React Compiler is enabled on this template. See [this documentation](https://react.dev/learn/react-compiler) for more information.
+Skeleton Loader: Displays animated grey blank cards (Shimmer effect) while the data is loading.
 
-Note: This will impact Vite dev & build performances.
+Error State: Shows a clean warning message along with a refresh button if a network or API error occurs.
 
-## Expanding the ESLint configuration
+Light/Dark Theme: Clicking the button in the navbar toggles the entire app between light and dark modes (saved automatically in Local Storage).
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+⚡ Optimization & Architecture (Code Quality)
+Custom Hooks: Used separate custom hooks for state management (useProducts) and input debouncing (useDebounce).
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+AbortController: Cancels previous pending API requests when rapidly changing pages or categories to prevent memory leaks and race conditions.
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+TypeScript: Ensures strict type safety (React.FC, Promise) across every data structure and component in the project.
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+Tailwind v4: Handles dark mode using the modern @variant approach without requiring any extra configuration files.
 
-```
+📂 File Structure
+src/component/ — Navbar, Footer, ProductCard, ProductModal, ProductSkeleton
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+src/hooks/ — useDebounce.ts, useProducts.ts
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+src/layouts/ — MainLayout.tsx
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+src/pages/ — ProductListing.tsx
 
-```
+src/types/ — product.ts
+
+src/index.css — Tailwind v4 directives and global body styles
