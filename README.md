@@ -36,3 +36,7 @@ src/pages/ — ProductListing.tsx
 src/types/ — product.ts
 
 src/index.css — Tailwind v4 directives and global body styles
+
+|Github Link: https://github.com/Jahid160/Product-Management
+
+Project Link: https://product-beta-murex.vercel.app/
