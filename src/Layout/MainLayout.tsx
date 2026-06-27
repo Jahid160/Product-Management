@@ -5,7 +5,7 @@ import { Footer } from "../component/Footer";
 
 const MainLayout = () => {
   return (
-    <div className="min-h-screen flex flex-col max-w-7xl mx-auto ">
+    <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors duration-300 flex flex-col max-w-7xl mx-auto ">
       <Navbar />
 
       <main className="grow w-full">

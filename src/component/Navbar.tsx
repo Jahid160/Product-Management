@@ -1,18 +1,30 @@
-import React, { useState } from "react";
-// Import Link from your router library
+import React, { useEffect, useState } from "react";
+
 import { Link } from "react-router";
 
-interface NavbarProps {
-  currentTheme?: "light" | "dark";
-  toggleTheme?: () => void;
-}
-
-export const Navbar: React.FC<NavbarProps> = ({
-  currentTheme = "light",
-  toggleTheme,
-}) => {
+export const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
-
+  const [isDark, setIsDark] = useState(() => {
+    return localStorage.getItem("theme") === "dark";
+  });
+  useEffect(() => {
+    if (isDark) {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  }, [isDark]);
+  const toggleTheme = () => {
+    if (isDark) {
+      document.documentElement.classList.remove("dark");
+      localStorage.setItem("theme", "light");
+      setIsDark(false);
+    } else {
+      document.documentElement.classList.add("dark");
+      localStorage.setItem("theme", "dark");
+      setIsDark(true);
+    }
+  };
   return (
     <nav className="bg-white dark:bg-gray-900 shadow-md sticky top-0 z-50 transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -27,8 +39,21 @@ export const Navbar: React.FC<NavbarProps> = ({
             </Link>
           </div>
 
-          {/* Desktop Navigation - Using Link instead of <a> */}
           <div className="hidden md:flex items-center space-x-8">
+            <button
+              onClick={toggleTheme}
+              className="p-2.5 rounded-xl bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all shadow-sm flex items-center gap-2 font-medium text-sm"
+            >
+              {isDark ? (
+                <>
+                  <span>☀️</span> Light Mode
+                </>
+              ) : (
+                <>
+                  <span>🌙</span> Dark Mode
+                </>
+              )}
+            </button>
             <Link
               to="/"
               className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 font-medium"
@@ -41,25 +66,10 @@ export const Navbar: React.FC<NavbarProps> = ({
             >
               Products
             </Link>
-
-            {toggleTheme && (
-              <button
-                onClick={toggleTheme}
-                className="p-2 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition"
-                aria-label="Toggle Theme"
-              >
-                {currentTheme === "light" ? "🌙" : "☀️"}
-              </button>
-            )}
           </div>
 
           {/* Mobile Menu Button */}
           <div className="flex items-center md:hidden gap-4">
-            {toggleTheme && (
-              <button onClick={toggleTheme} className="p-2 text-lg">
-                {currentTheme === "light" ? "🌙" : "☀️"}
-              </button>
-            )}
             <button
               onClick={() => setIsOpen(!isOpen)}
               className="text-gray-700 dark:text-gray-300 hover:text-blue-600 focus:outline-none"

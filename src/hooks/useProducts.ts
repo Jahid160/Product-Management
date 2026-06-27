@@ -8,7 +8,7 @@ interface ProductsState {
   error: string | null;
 }
 
-export const useProducts = () => {
+export const useProducts = (url: string) => {
   const [state, setState] = useState<ProductsState>({
     data: [],
     categories: [],
@@ -17,6 +17,7 @@ export const useProducts = () => {
   });
 
   useEffect(() => {
+    if (!url) return;
     const controller = new AbortController();
     const { signal } = controller;
 
@@ -24,7 +25,7 @@ export const useProducts = () => {
       try {
         setState((prev) => ({ ...prev, loading: true, error: null }));
 
-        const response = await fetch("https://fakestoreapi.com/products", {
+        const response = await fetch(url, {
           signal,
         });
 
@@ -63,7 +64,7 @@ export const useProducts = () => {
     return () => {
       controller.abort();
     };
-  }, []);
+  }, [url]);
 
   return state;
 };

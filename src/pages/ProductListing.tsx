@@ -16,8 +16,13 @@ export const ProductListing = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
   const debouncedSearchQuery = useDebounce(searchQuery, 500);
-
-  const { data: allProducts, categories, loading, error } = useProducts();
+  const API_URL = "https://fakestoreapi.com/products";
+  const {
+    data: allProducts,
+    categories,
+    loading,
+    error,
+  } = useProducts(API_URL);
 
   useEffect(() => {}, [debouncedSearchQuery, selectedCategory]);
 
